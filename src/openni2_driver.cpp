@@ -80,6 +80,14 @@ OpenNI2Driver::OpenNI2Driver(ros::NodeHandle& n, ros::NodeHandle& pnh) :
     boost::filesystem::create_symlink(ini_file_path, cwd + "/NiTE.ini");
   }
 
+  std::string target_nite_folder = cwd + "/NiTE2";
+  std::string nite_folder_path = ros::package::getPath("openni2_camera") + "/lib/NiTE2";
+  if (!boost::filesystem::exists(target_nite_folder))
+  {
+    ROS_WARN_STREAM("Making symlink from " << nite_folder_path << " to " << target_nite_folder << " This is required by NiTE2");
+    boost::filesystem::create_symlink(nite_folder_path, cwd + "/NiTE2");
+  }
+
   genVideoModeTableMap();
 
   readConfigFromParameterServer();
