@@ -57,6 +57,7 @@
 #include <camera_info_manager/camera_info_manager.h>
 #include <sensor_msgs/Image.h>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 // Std C++ headers
 #include <string>
@@ -142,6 +143,8 @@ private:
                       nite::UserTracker& userTracker);
   bool getCameraPose(geometry_msgs::TransformStamped& cameraPose);
 
+  void publishTransforms(nite::UserTrackerFrameRef userTracker, const std::string& frame_id);
+
   ros::NodeHandle& nh_;
   ros::NodeHandle& pnh_;
 
@@ -214,6 +217,8 @@ private:
 
   bool use_device_time_;
 
+  bool publish_skeletons_tf_;
+
   Config old_config_;
 
   //NiTE hand tracking and gesture recognition  
@@ -228,6 +233,7 @@ private:
   std::map<nite::UserId, cv::Scalar> user_id_color_; //what color is used to paint each tracker user
   int next_available_color_id_;
   tf::TransformListener tf_listener_;
+  tf::TransformBroadcaster tf_br_;
   bool publish_camera_pose_;
 };
 

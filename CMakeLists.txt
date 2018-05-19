@@ -18,14 +18,17 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}")
 
 add_definitions(-D__linux__)
+add_definitions(-Di386)
 
 
 find_package(PkgConfig)
 
-pkg_check_modules(PC_OPENNI2 libopenni2)
-if (NOT PC_OPENNI2_FOUND)
-  pkg_check_modules(PC_OPENNI2 REQUIRED openni2)
-endif()
+# pkg_check_modules(PC_OPENNI2 libopenni2)
+# if (NOT PC_OPENNI2_FOUND)
+#   pkg_check_modules(PC_OPENNI2 REQUIRED openni2)
+# endif()
+
+find_package(OpenNI2)
 
 find_package(NiTE2 REQUIRED)
 
@@ -44,11 +47,11 @@ catkin_package(
 include_directories(include 
                     ${catkin_INCLUDE_DIRS} 
                     ${Boost_INCLUDE_DIRS}
-                    ${PC_OPENNI2_INCLUDE_DIRS}
+                    ${OPENNI2_INCLUDE_DIRS}
                     ${NITE2_INCLUDE_DIRS}
                     )
 
-link_directories(${PC_OPENNI2_LIBRARY_DIRS})
+link_directories(${OPENNI2_LIBRARY_DIRS})
 
 add_library(openni2_wrapper
    src/openni2_convert.cpp
@@ -62,7 +65,7 @@ add_library(openni2_wrapper
    src/openni2_exception.cpp
    src/openni2_video_mode.cpp
 )
-target_link_libraries(openni2_wrapper ${catkin_LIBRARIES} ${PC_OPENNI2_LIBRARIES} ${Boost_LIBRARIES} 
+target_link_libraries(openni2_wrapper ${catkin_LIBRARIES} ${OPENNI2_LIBRARIES} ${Boost_LIBRARIES} 
                                                       ${NITE2_LIBRARIES})
 
 add_executable(test_wrapper test/test_wrapper.cpp )
@@ -115,4 +118,14 @@ install(FILES openni2_nodelets.xml
 install(FILES etc/NiTE.ini
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/etc
 )
+
+# install provided Openni2 and NiTE2 binaries
+install(DIRECTORY "lib/OpenNI2"
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+install(FILES "lib/libOpenNI2.so" "lib/libNiTE2.so"
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+
+
 

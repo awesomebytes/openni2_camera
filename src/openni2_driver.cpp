@@ -249,6 +249,8 @@ void OpenNI2Driver::configCb(Config &config, uint32_t level)
 
   applyConfigToOpenNIDevice();
 
+  publish_skeletons_tf_ = config.publish_skeletons_tf;
+
   config_init_ = true;
 
   old_config_ = config;
@@ -610,7 +612,7 @@ void OpenNI2Driver::newHandTrackerFrameCallback(nite::HandTrackerFrameRef handTr
 bool OpenNI2Driver::getCameraPose(geometry_msgs::TransformStamped& cameraPose)
 {  
   //Get the camera frame pose wrt /base_link
-  std::string referenceFrame = "/base_link";
+  std::string referenceFrame = "/base_footprint";
   double timeOutMs = 1000;
   std::string errMsg;
   if ( !tf_listener_.waitForTransform(referenceFrame, color_frame_id_,
@@ -834,9 +836,8 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
   pub_user_map_.publish(img_msg);
 }
 
-void publishTransform(const nite::UserData& user, nite::JointType const& joint_name, const std::string& frame_id,
+tf::StampedTransform createTransform(const nite::UserData& user, nite::JointType const& joint_name, const std::string& frame_id,
                       const std::string& child_frame_id) {
-    static tf::TransformBroadcaster br;
     const nite::SkeletonJoint joint = user.getSkeleton().getJoint(joint_name);
     const nite::Point3f joint_position = joint.getPosition();
     const nite::Quaternion joint_orientation = joint.getOrientation();
@@ -865,36 +866,41 @@ void publishTransform(const nite::UserData& user, nite::JointType const& joint_n
     change_frame.setRotation(frame_rotation);
 
     transform = change_frame * transform;
-    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), frame_id, child_frame_id));
+    return tf::StampedTransform(transform, ros::Time::now(), frame_id, child_frame_id);
 }
 
-void publishTransforms(nite::UserTrackerFrameRef userTracker, const std::string& frame_id) {
+void OpenNI2Driver::publishTransforms(nite::UserTrackerFrameRef userTracker, const std::string& frame_id) {
+  std::vector<tf::StampedTransform> transforms;
   for (int i = 0; i < userTracker.getUsers().getSize(); ++i)
   {
     const nite::UserData& user = userTracker.getUsers()[i];
     if (user.getSkeleton().getState() != nite::SKELETON_TRACKED)
       continue;
+        std::stringstream ss;
+        ss << user.getId();
 
-        publishTransform(user, nite::JOINT_HEAD,           frame_id, "head");
-        publishTransform(user, nite::JOINT_NECK,           frame_id, "neck");
-        publishTransform(user, nite::JOINT_TORSO,          frame_id, "torso");
+        transforms.push_back(createTransform(user, nite::JOINT_HEAD,           frame_id, "head" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_NECK,           frame_id, "neck" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_TORSO,          frame_id, "torso" + ss.str()));
 
-        publishTransform(user, nite::JOINT_LEFT_SHOULDER,  frame_id, "left_shoulder");
-        publishTransform(user, nite::JOINT_LEFT_ELBOW,     frame_id, "left_elbow");
-        publishTransform(user, nite::JOINT_LEFT_HAND,      frame_id, "left_hand");
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_SHOULDER,  frame_id, "left_shoulder" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_ELBOW,     frame_id, "left_elbow" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_HAND,      frame_id, "left_hand" + ss.str()));
 
-        publishTransform(user, nite::JOINT_RIGHT_SHOULDER, frame_id, "right_shoulder");
-        publishTransform(user, nite::JOINT_RIGHT_ELBOW,    frame_id, "right_elbow");
-        publishTransform(user, nite::JOINT_RIGHT_HAND,     frame_id, "right_hand");
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_SHOULDER, frame_id, "right_shoulder" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_ELBOW,    frame_id, "right_elbow" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_HAND,     frame_id, "right_hand" + ss.str()));
 
-        publishTransform(user, nite::JOINT_LEFT_HIP,       frame_id, "left_hip");
-        publishTransform(user, nite::JOINT_LEFT_KNEE,      frame_id, "left_knee");
-        publishTransform(user, nite::JOINT_LEFT_FOOT,      frame_id, "left_foot");
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_HIP,       frame_id, "left_hip" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_KNEE,      frame_id, "left_knee" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_LEFT_FOOT,      frame_id, "left_foot" + ss.str()));
 
-        publishTransform(user, nite::JOINT_RIGHT_HIP,      frame_id, "right_hip");
-        publishTransform(user, nite::JOINT_RIGHT_KNEE,     frame_id, "right_knee");
-        publishTransform(user, nite::JOINT_RIGHT_FOOT,     frame_id, "right_foot");
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_HIP,      frame_id, "right_hip" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_KNEE,     frame_id, "right_knee" + ss.str()));
+        transforms.push_back(createTransform(user, nite::JOINT_RIGHT_FOOT,     frame_id, "right_foot" + ss.str()));
     }
+    if (transforms.size() > 0)
+      tf_br_.sendTransform(transforms);
 }
 
 void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTrackerFrame,
@@ -925,7 +931,9 @@ void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTr
                    userTracker);
   }
 
-  publishTransforms(userTrackerFrame, depth_frame_id_);
+  if (publish_skeletons_tf_)
+    // Publish transforms of the skeletons in TF
+    publishTransforms(userTrackerFrame, depth_frame_id_);
 }
 
 // Methods to get calibration parameters for the various cameras
