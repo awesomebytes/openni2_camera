@@ -666,7 +666,7 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
   for (int i = 0; i < users.getSize(); ++i)
   {
     const nite::UserData& user = users[i];
-    if ( user.getSkeleton().getState() == nite::SKELETON_TRACKED &&
+    if ( //user.getSkeleton().getState() == nite::SKELETON_TRACKED &&
          user.isVisible() && !user.isLost() )
     {
       pal_detection_msgs::PersonDetection detectionMsg;
@@ -923,6 +923,9 @@ void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTr
     if (user.isNew() && publish_skeletons_tf_)
     {
       userTracker.startSkeletonTracking(user.getId());
+    }
+    else if (user.isNew()){
+      userTracker.startPoseDetection(user.getId(), );
     }
   }
 
