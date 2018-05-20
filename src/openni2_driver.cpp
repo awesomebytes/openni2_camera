@@ -924,9 +924,6 @@ void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTr
     {
       userTracker.startSkeletonTracking(user.getId());
     }
-    else if (user.isNew()){
-      userTracker.startPoseDetection(user.getId(), );
-    }
   }
 
   if (num_users_subscribers_)
