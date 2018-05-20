@@ -35,6 +35,7 @@
 // PAL headers
 #include <pal_detection_msgs/Gesture.h>
 #include <pal_detection_msgs/PersonDetections.h>
+#include <pal_detection_msgs/MagicDetections.h>
 
 // ROS headers
 #include <ros/package.h>
@@ -166,6 +167,8 @@ void OpenNI2Driver::advertiseROSTopics()
     pub_users_ = nh_.advertise<pal_detection_msgs::PersonDetections>("users", 1, rssc, rssc);
     image_transport::SubscriberStatusCallback itssc = boost::bind(&OpenNI2Driver::userTrackerConnectCb, this);
     pub_user_map_ = user_tracker_image_transport_.advertise("user_map", 1, itssc, itssc);
+
+    pub_users_magic_ = nh_.advertise<pal_detection_msgs::MagicDetections>("users_magic", 1, rssc, rssc);
 
     pub_user_depth_img_ = user_depth_image_transport_.advertise("user_depth", 1);
 
@@ -506,7 +509,7 @@ void OpenNI2Driver::userTrackerConnectCb()
 {
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-  num_users_subscribers_ = pub_users_.getNumSubscribers() > 0;
+  num_users_subscribers_ = pub_users_.getNumSubscribers() > 0 || pub_users_magic_.getNumSubscribers() > 0;
   user_map_subscribers_  = pub_user_map_.getNumSubscribers() > 0;
 }
 
@@ -659,11 +662,15 @@ bool OpenNI2Driver::getCameraPose(geometry_msgs::TransformStamped& cameraPose)
 void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
 {
   pal_detection_msgs::PersonDetections detectionsMsg;
+  pal_detection_msgs::MagicDetections magicDetectionsMsg;
 
-  if ( publish_camera_pose_ )
+  if ( publish_camera_pose_ ){
     getCameraPose(detectionsMsg.camera_pose);
+    getCameraPose(magicDetectionsMsg.camera_pose);
+  }
 
   detectionsMsg.header.stamp = ros::Time::now();
+  magicDetectionsMsg.header.stamp = ros::Time::now();
 
   const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
   for (int i = 0; i < users.getSize(); ++i)
@@ -673,6 +680,7 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
          user.isVisible() && !user.isLost() )
     {
       pal_detection_msgs::PersonDetection detectionMsg;
+      pal_detection_msgs::MagicDetection magicDetectionMsg;
 
 
       std::cout << "Bounding box  min = (" << user.getBoundingBox().min.x << ", " << user.getBoundingBox().min.y << ", " << user.getBoundingBox().min.z << ")" <<
@@ -701,8 +709,37 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
       detectionMsg.position3D.point.y *= -1.0;
       detectionMsg.position3D.point.z = user.getCenterOfMass().z/1000.0;
 
+      magicDetectionMsg.CameraDepth_optical_frame_point = detectionMsg.position3D;
+
+
+      try
+        {
+          tf_listener_.transformPoint("base_footprint",
+                                      magicDetectionMsg.CameraDepth_optical_frame_point,
+                                      magicDetectionMsg.base_footprint_point);
+        }
+        catch ( const tf::TransformException& e)
+        {
+          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to base_footprint");
+        }
+
+      try
+        {
+          tf_listener_.transformPoint("odom",
+                                      magicDetectionMsg.base_footprint_point,
+                                      magicDetectionMsg.odom_point);
+        }
+        catch ( const tf::TransformException& e)
+        {
+          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to base_footprint");
+        }
+
+      magicDetectionMsg.id = user.getId();
+      magicDetectionsMsg.detections.push_back(magicDetectionMsg);
+
       std::cout << "User position from depth image:        " << worldX/1000 << ", " << worldY/1000 << ", " << worldZ/1000 << " m " << std::endl;
       std::cout << "user position provided by UserTracker: " << detectionMsg.position3D.point.x << ", " << detectionMsg.position3D.point.y << ", " << detectionMsg.position3D.point.z << " m" << std::endl;
+      std::cout << "user position on base_footprint: " << magicDetectionMsg.base_footprint_point.point.x << ", " << magicDetectionMsg.base_footprint_point.point.y << ", " << magicDetectionMsg.base_footprint_point.point.z << std::endl;
       std::cout << std::endl;
       std::stringstream ss;
       ss << user.getId();
@@ -714,6 +751,9 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
 
   if ( !detectionsMsg.persons.empty() )
     pub_users_.publish(detectionsMsg);
+
+  if ( !magicDetectionsMsg.detections.empty() )
+    pub_users_magic_.publish(magicDetectionsMsg);
 }
 
 void OpenNI2Driver::drawSkeletonLink(nite::UserTracker& userTracker,

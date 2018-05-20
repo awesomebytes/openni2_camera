@@ -238,6 +238,8 @@ private:
   tf::TransformBroadcaster tf_br_;
   bool publish_camera_pose_;
 
+  ros::Publisher pub_users_magic_;
+
   image_transport::ImageTransport user_depth_image_transport_;
   image_transport::Publisher pub_user_depth_img_;
   cv_bridge::CvImage cv_image_user_depth_;
