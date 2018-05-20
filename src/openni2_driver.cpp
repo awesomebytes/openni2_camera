@@ -818,7 +818,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
     const nite::UserData& user = users[i];
     nite::UserId nId = user.getId();
 
-    if ( user.getSkeleton().getState() == nite::SKELETON_TRACKED &&
+    if ( // user.getSkeleton().getState() == nite::SKELETON_TRACKED &&
          user.isVisible() && !user.isLost() )
     {      
       cv::Mat userMask = (cvUserMap == nId);
@@ -832,7 +832,8 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       //paint user mask in the image
       userImage.setTo(user_id_color_[nId], userMask);
 
-      drawSkeleton(userTracker, user, userImage);
+      if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
+        drawSkeleton(userTracker, user, userImage);
     }
   }
 
