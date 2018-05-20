@@ -855,7 +855,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       cv_image_user1_.toImageMsg(img_msg);
       pub_user1_img_.publish(img_msg);
 
-      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
       cv_image_user2_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user2_.image = userImage;
@@ -863,7 +863,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       cv_image_user2_.toImageMsg(img_msg);
       pub_user2_img_.publish(img_msg);
 
-      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
       cv_image_user3_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user3_.image = userImage;
@@ -871,7 +871,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       cv_image_user3_.toImageMsg(img_msg);
       pub_user3_img_.publish(img_msg);
 
-      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
       cv_image_user4_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user4_.image = userImage;
