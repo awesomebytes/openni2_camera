@@ -581,17 +581,6 @@ void OpenNI2Driver::newDepthFrameCallback(sensor_msgs::ImagePtr image)
         cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
       }
 
-      // Store the last depth image we had
-      try
-      {
-        last_depth_frame_ = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::TYPE_16UC1);
-      }
-      catch (cv_bridge::Exception& e)
-      {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-      }
-
       if (depth_raw_subscribers_)
       {
         pub_depth_raw_.publish(image, cam_info);
