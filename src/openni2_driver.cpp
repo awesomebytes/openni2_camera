@@ -958,7 +958,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
         sensor_msgs::ImagePtr curr_depth_frame = fromDepthFrameToRosImage(frame);
         cv_bridge::CvImagePtr cv_curr_depth_frame = cv_bridge::toCvCopy(curr_depth_frame, curr_depth_frame->encoding);
         cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-        if (pub_user1_img_.getNumSubscribers() > 0){
+        if (pub_user1_img_.getNumSubscribers() > 0 && (nId == 1)){
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user1_.encoding = curr_depth_frame->encoding;
           cv_image_user1_.image = userImage;
@@ -967,7 +967,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
           pub_user1_img_.publish(img_msg);
         }
 
-        if (pub_user2_img_.getNumSubscribers() > 0){
+        if (pub_user2_img_.getNumSubscribers() > 0 && (nId == 2)){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user2_.encoding = curr_depth_frame->encoding;
@@ -977,7 +977,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
           pub_user2_img_.publish(img_msg);
         }
 
-        if (pub_user3_img_.getNumSubscribers() > 0){
+        if (pub_user3_img_.getNumSubscribers() > 0 && (nId == 3)){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user3_.encoding = curr_depth_frame->encoding;
@@ -987,7 +987,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
           pub_user3_img_.publish(img_msg);
         }
 
-        if (pub_user4_img_.getNumSubscribers() > 0){
+        if (pub_user4_img_.getNumSubscribers() > 0 && (nId == 4)){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user4_.encoding = curr_depth_frame->encoding;
