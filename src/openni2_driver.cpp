@@ -860,7 +860,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       sensor_msgs::Image img_msg;
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       if (pub_user1_img_.getNumSubscribers() > 0){
-        last_depth_frame_->copyTo(userImage, userMask);
+        last_depth_frame_->image.copyTo(userImage, userMask);
         cv_image_user1_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         cv_image_user1_.image = userImage;
         img_msg.header.stamp = ros::Time::now();
@@ -869,7 +869,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       }
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      last_depth_frame_->copyTo(userImage, userMask);
+      last_depth_frame_->image.copyTo(userImage, userMask);
       cv_image_user2_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user2_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
@@ -877,7 +877,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       pub_user2_img_.publish(img_msg);
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      last_depth_frame_->copyTo(userImage, userMask);
+      last_depth_frame_->image.copyTo(userImage, userMask);
       cv_image_user3_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user3_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
@@ -885,7 +885,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       pub_user3_img_.publish(img_msg);
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      last_depth_frame_->copyTo(userImage, userMask);
+      last_depth_frame_->image.copyTo(userImage, userMask);
       cv_image_user4_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user4_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
