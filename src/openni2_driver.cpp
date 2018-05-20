@@ -842,7 +842,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       cv::putText(userImage, std::to_string(nId),
                   // the numbers should appear in the same place
                   // upper left corner 1 2 3 4
-                  cv::Point(4 + nId*6, 15),
+                  cv::Point(4 + nId*10, 15),
                   fontFace,
                   fontScale,
                   user_id_color_[nId],
