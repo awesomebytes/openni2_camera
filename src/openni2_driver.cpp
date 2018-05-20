@@ -959,7 +959,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
         cv_bridge::CvImagePtr cv_curr_depth_frame = cv_bridge::toCvCopy(curr_depth_frame, curr_depth_frame->encoding);
         cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
         if (pub_user1_img_.getNumSubscribers() > 0){
-          curr_depth_frame->image.copyTo(userImage, userMask);
+          cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user1_.encoding = curr_depth_frame->encoding;
           cv_image_user1_.image = userImage;
           img_msg.header.stamp = ros::Time::now();
@@ -969,7 +969,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
 
         if (pub_user2_img_.getNumSubscribers() > 0){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          curr_depth_frame->image.copyTo(userImage, userMask);
+          cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user2_.encoding = curr_depth_frame->encoding;
           cv_image_user2_.image = userImage;
           img_msg.header.stamp = ros::Time::now();
@@ -979,7 +979,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
 
         if (pub_user3_img_.getNumSubscribers() > 0){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          curr_depth_frame->image.copyTo(userImage, userMask);
+          cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user3_.encoding = curr_depth_frame->encoding;
           cv_image_user3_.image = userImage;
           img_msg.header.stamp = ros::Time::now();
@@ -989,7 +989,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
 
         if (pub_user4_img_.getNumSubscribers() > 0){
           userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          curr_depth_frame->image.copyTo(userImage, userMask);
+          cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user4_.encoding = curr_depth_frame->encoding;
           cv_image_user4_.image = userImage;
           img_msg.header.stamp = ros::Time::now();
