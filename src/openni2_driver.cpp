@@ -834,8 +834,8 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
   cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_8UC3);
   // Paint also idNumber in same color
   int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
-  double fontScale = 2;
-  int thickness = 3;
+  double fontScale = 1;
+  int thickness = 1;
 
   const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
   for (int i = 0; i < users.getSize(); ++i)
@@ -860,7 +860,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       cv::putText(userImage, std::to_string(nId),
                   // the numbers should appear in the same place
                   // upper left corner 1 2 3 4
-                  cv::Point(nId*4, 0),
+                  cv::Point(nId*6, 10),
                   fontFace,
                   fontScale,
                   user_id_color_[nId],
