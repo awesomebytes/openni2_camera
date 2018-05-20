@@ -1062,9 +1062,11 @@ void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTr
 
   if (user_map_subscribers_)
   {
-    //publisher user's segmentation map
-    publishUserMap(userTrackerFrame,
-                   userTracker);
+    // Do it at the depth frame rate
+    if (data_skip_depth_counter_ % data_skip_ == 0)
+      //publisher user's segmentation map
+      publishUserMap(userTrackerFrame,
+                     userTracker);
   }
 
   // Takes care internally if there are subscribers or not
