@@ -832,6 +832,10 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
                     userMap.getStride());
 
   cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_8UC3);
+  // Paint also idNumber in same color
+  int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
+  double fontScale = 2;
+  int thickness = 3;
 
   const nite::Array<nite::UserData>& users = userTrackerFrame.getUsers();
   for (int i = 0; i < users.getSize(); ++i)
@@ -852,11 +856,22 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       }
       //paint user mask in the image
       userImage.setTo(user_id_color_[nId], userMask);
+      // Write the number of the ID in its color
+      cv::putText(userImage, std::to_string(nId),
+                  // the numbers should appear in the same place
+                  // upper left corner 1 2 3 4
+                  cv::Point(nId*4, 0),
+                  fontFace,
+                  fontScale,
+                  user_id_color_[nId],
+                  thickness);
 
       if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
         drawSkeleton(userTracker, user, userImage);
     }
   }
+
+
 
   cv_image_.encoding = sensor_msgs::image_encodings::BGR8;
   cv_image_.image = userImage;
