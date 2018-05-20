@@ -956,11 +956,11 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
           cv_image_user_depth_.encoding = curr_depth_frame->encoding;
           cv_image_user_depth_.image = userImage;
+          cv_image_user_depth_.toImageMsg(img_msg);
           // Hack, we publish in the frame_id the ID of the user
           // so clients can just use the ones they are interested in
           img_msg.header.frame_id = std::to_string(nId);
           img_msg.header.stamp = ros::Time::now();
-          cv_image_user_depth_.toImageMsg(img_msg);
           pub_user_depth_img_.publish(img_msg);
         }
       }
