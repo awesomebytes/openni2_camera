@@ -68,6 +68,10 @@ OpenNI2Driver::OpenNI2Driver(ros::NodeHandle& n, ros::NodeHandle& pnh) :
     num_users_subscribers_(false),
     user_map_subscribers_(false),
     user_tracker_image_transport_(nh_),
+    user1_image_transport_(nh_),
+    user2_image_transport_(nh_),
+    user3_image_transport_(nh_),
+    user4_image_transport_(nh_),
     next_available_color_id_(0)
 {
 
@@ -165,6 +169,12 @@ void OpenNI2Driver::advertiseROSTopics()
     pub_users_ = nh_.advertise<pal_detection_msgs::PersonDetections>("users", 1, rssc, rssc);
     image_transport::SubscriberStatusCallback itssc = boost::bind(&OpenNI2Driver::userTrackerConnectCb, this);
     pub_user_map_ = user_tracker_image_transport_.advertise("user_map", 1, itssc, itssc);
+
+    pub_user1_img_ = user1_image_transport_.advertise("user_depth_1", 1);
+    pub_user2_img_ = user2_image_transport_.advertise("user_depth_2", 1);
+    pub_user3_img_ = user3_image_transport_.advertise("user_depth_3", 1);
+    pub_user4_img_ = user4_image_transport_.advertise("user_depth_4", 1);
+
 
     geometry_msgs::TransformStamped cameraPose;
     //request camera pose to see if it is available in TF
@@ -834,6 +844,45 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
 
       if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
         drawSkeleton(userTracker, user, userImage);
+
+      // deal with every depth map for every user separated publication
+      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      cvUserMap.copyTo(userImage, userMask);
+      cv_image_user1_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user1_.image = userImage;
+      sensor_msgs::Image img_msg;
+      img_msg.header.stamp = ros::Time::now();
+      cv_image_user1_.toImageMsg(img_msg);
+      pub_user1_img_.publish(img_msg);
+
+      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      cvUserMap.copyTo(userImage, userMask);
+      cv_image_user2_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user2_.image = userImage;
+      sensor_msgs::Image img_msg;
+      img_msg.header.stamp = ros::Time::now();
+      cv_image_user2_.toImageMsg(img_msg);
+      pub_user2_img_.publish(img_msg);
+
+      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      cvUserMap.copyTo(userImage, userMask);
+      cv_image_user3_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user3_.image = userImage;
+      sensor_msgs::Image img_msg;
+      img_msg.header.stamp = ros::Time::now();
+      cv_image_user3_.toImageMsg(img_msg);
+      pub_user3_img_.publish(img_msg);
+
+      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
+      cvUserMap.copyTo(userImage, userMask);
+      cv_image_user4_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user4_.image = userImage;
+      sensor_msgs::Image img_msg;
+      img_msg.header.stamp = ros::Time::now();
+      cv_image_user4_.toImageMsg(img_msg);
+      pub_user4_img_.publish(img_msg);
+
+
     }
   }
 

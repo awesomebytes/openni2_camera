@@ -235,6 +235,20 @@ private:
   tf::TransformListener tf_listener_;
   tf::TransformBroadcaster tf_br_;
   bool publish_camera_pose_;
+
+  image_transport::ImageTransport user1_image_transport_;
+  image_transport::Publisher pub_user1_img_;
+  cv_bridge::CvImage cv_image_user1_;
+  image_transport::ImageTransport user2_image_transport_;
+  image_transport::Publisher pub_user2_img_;
+  cv_bridge::CvImage cv_image_user2_;
+  image_transport::ImageTransport user3_image_transport_;
+  image_transport::Publisher pub_user3_img_;
+  cv_bridge::CvImage cv_image_user3_;
+  image_transport::ImageTransport user4_image_transport_;
+  image_transport::Publisher pub_user4_img_;
+  cv_bridge::CvImage cv_image_user4_;
+
 };
 
 }
