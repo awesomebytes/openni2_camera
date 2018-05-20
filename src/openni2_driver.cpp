@@ -68,10 +68,7 @@ OpenNI2Driver::OpenNI2Driver(ros::NodeHandle& n, ros::NodeHandle& pnh) :
     num_users_subscribers_(false),
     user_map_subscribers_(false),
     user_tracker_image_transport_(nh_),
-    user1_image_transport_(nh_),
-    user2_image_transport_(nh_),
-    user3_image_transport_(nh_),
-    user4_image_transport_(nh_),
+    user_depth_image_transport_(nh_),
     next_available_color_id_(0)
 {
 
@@ -170,11 +167,7 @@ void OpenNI2Driver::advertiseROSTopics()
     image_transport::SubscriberStatusCallback itssc = boost::bind(&OpenNI2Driver::userTrackerConnectCb, this);
     pub_user_map_ = user_tracker_image_transport_.advertise("user_map", 1, itssc, itssc);
 
-    pub_user1_img_ = user1_image_transport_.advertise("user_depth_1", 1);
-    pub_user2_img_ = user2_image_transport_.advertise("user_depth_2", 1);
-    pub_user3_img_ = user3_image_transport_.advertise("user_depth_3", 1);
-    pub_user4_img_ = user4_image_transport_.advertise("user_depth_4", 1);
-
+    pub_user_depth_img_ = user_depth_image_transport_.advertise("user_depth", 1);
 
     geometry_msgs::TransformStamped cameraPose;
     //request camera pose to see if it is available in TF
@@ -945,10 +938,7 @@ sensor_msgs::ImagePtr fromDepthFrameToRosImage(openni::VideoFrameRef m_frame){
 void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame,
                                    nite::UserTracker& userTracker)
 {
-  if (pub_user1_img_.getNumSubscribers() > 0 ||
-      pub_user2_img_.getNumSubscribers() > 0 ||
-      pub_user3_img_.getNumSubscribers() > 0 ||
-      pub_user4_img_.getNumSubscribers() > 0 ){
+  if (pub_user_depth_img_.getNumSubscribers() > 0){
     nite::UserMap userMap = userTrackerFrame.getUserMap();
     cv::Mat cvUserMap(userMap.getHeight(), userMap.getWidth(),
                       CV_16UC1, reinterpret_cast<void*>(const_cast<nite::UserId*>(userMap.getPixels())),
@@ -973,46 +963,17 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
         sensor_msgs::ImagePtr curr_depth_frame = fromDepthFrameToRosImage(frame);
         cv_bridge::CvImagePtr cv_curr_depth_frame = cv_bridge::toCvCopy(curr_depth_frame, curr_depth_frame->encoding);
         cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-        if (pub_user1_img_.getNumSubscribers() > 0 && (nId == 1)){
+        if (pub_user_depth_img_.getNumSubscribers() > 0){
           cv_curr_depth_frame->image.copyTo(userImage, userMask);
-          cv_image_user1_.encoding = curr_depth_frame->encoding;
-          cv_image_user1_.image = userImage;
+          cv_image_user_depth_.encoding = curr_depth_frame->encoding;
+          cv_image_user_depth_.image = userImage;
+          // Hack, we publish in the frame_id the ID of the user
+          // so clients can just use the ones they are interested in
+          img_msg.header.frame_id = std::to_string(nId);
           img_msg.header.stamp = ros::Time::now();
-          cv_image_user1_.toImageMsg(img_msg);
-          pub_user1_img_.publish(img_msg);
+          cv_image_user_depth_.toImageMsg(img_msg);
+          pub_user_depth_img_.publish(img_msg);
         }
-
-        if (pub_user2_img_.getNumSubscribers() > 0 && (nId == 2)){
-          userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          cv_curr_depth_frame->image.copyTo(userImage, userMask);
-          cv_image_user2_.encoding = curr_depth_frame->encoding;
-          cv_image_user2_.image = userImage;
-          img_msg.header.stamp = ros::Time::now();
-          cv_image_user2_.toImageMsg(img_msg);
-          pub_user2_img_.publish(img_msg);
-        }
-
-        if (pub_user3_img_.getNumSubscribers() > 0 && (nId == 3)){
-          userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          cv_curr_depth_frame->image.copyTo(userImage, userMask);
-          cv_image_user3_.encoding = curr_depth_frame->encoding;
-          cv_image_user3_.image = userImage;
-          img_msg.header.stamp = ros::Time::now();
-          cv_image_user3_.toImageMsg(img_msg);
-          pub_user3_img_.publish(img_msg);
-        }
-
-        if (pub_user4_img_.getNumSubscribers() > 0 && (nId == 4)){
-          userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-          cv_curr_depth_frame->image.copyTo(userImage, userMask);
-          cv_image_user4_.encoding = curr_depth_frame->encoding;
-          cv_image_user4_.image = userImage;
-          img_msg.header.stamp = ros::Time::now();
-          cv_image_user4_.toImageMsg(img_msg);
-          pub_user4_img_.publish(img_msg);
-        }
-
-
       }
     }
   }

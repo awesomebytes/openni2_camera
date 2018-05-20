@@ -238,20 +238,9 @@ private:
   tf::TransformBroadcaster tf_br_;
   bool publish_camera_pose_;
 
-
-  cv_bridge::CvImagePtr last_depth_frame_;
-  image_transport::ImageTransport user1_image_transport_;
-  image_transport::Publisher pub_user1_img_;
-  cv_bridge::CvImage cv_image_user1_;
-  image_transport::ImageTransport user2_image_transport_;
-  image_transport::Publisher pub_user2_img_;
-  cv_bridge::CvImage cv_image_user2_;
-  image_transport::ImageTransport user3_image_transport_;
-  image_transport::Publisher pub_user3_img_;
-  cv_bridge::CvImage cv_image_user3_;
-  image_transport::ImageTransport user4_image_transport_;
-  image_transport::Publisher pub_user4_img_;
-  cv_bridge::CvImage cv_image_user4_;
+  image_transport::ImageTransport user_depth_image_transport_;
+  image_transport::Publisher pub_user_depth_img_;
+  cv_bridge::CvImage cv_image_user_depth_;
 
 };
 
