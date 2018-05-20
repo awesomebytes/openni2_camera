@@ -935,7 +935,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
         // deal with every depth map for every user separated publication
         sensor_msgs::Image img_msg;
         openni::VideoFrameRef frame = userTrackerFrame.getDepthFrame();
-        sensor_msgs::Image curr_depth_frame = from_depth_frame_to_ros_image(frame);
+        sensor_msgs::ImagePtr curr_depth_frame = from_depth_frame_to_ros_image(frame);
         cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
         if (pub_user1_img_.getNumSubscribers() > 0){
           curr_depth_frame->image.copyTo(userImage, userMask);
@@ -983,7 +983,7 @@ void OpenNI2Driver::publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame
 }
 
 
-sensor_msgs::Image from_depth_frame_to_ros_image(openni::VideoFrameRef m_frame){
+sensor_msgs::ImagePtr fromDepthFrameToRosImage(openni::VideoFrameRef m_frame){
     sensor_msgs::ImagePtr image(new sensor_msgs::Image);
 
     ros::Time ros_now = ros::Time::now();
