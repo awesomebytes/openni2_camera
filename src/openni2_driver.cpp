@@ -849,7 +849,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       sensor_msgs::Image img_msg;
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
-      cv_image_user1_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user1_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user1_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
       cv_image_user1_.toImageMsg(img_msg);
@@ -857,7 +857,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
 
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
-      cv_image_user2_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user2_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user2_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
       cv_image_user2_.toImageMsg(img_msg);
@@ -865,7 +865,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
 
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
-      cv_image_user3_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user3_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user3_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
       cv_image_user3_.toImageMsg(img_msg);
@@ -873,7 +873,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
 
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
       cvUserMap.copyTo(userImage, userMask);
-      cv_image_user4_.encoding = sensor_msgs::image_encodings::16UC1;
+      cv_image_user4_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user4_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
       cv_image_user4_.toImageMsg(img_msg);
