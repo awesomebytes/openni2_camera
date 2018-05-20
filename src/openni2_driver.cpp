@@ -725,11 +725,11 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
         {
           tf_listener_.transformPoint("Head",
                                       magicDetectionMsg.CameraDepth_optical_frame_point,
-                                      magicDetectionMsg.head_point);
+                                      magicDetectionMsg.Head_point);
         }
         catch ( const tf::TransformException& e)
         {
-          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to head");
+          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to Head");
         }
 
 
@@ -772,8 +772,8 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
       magicDetectionMsg.base_footprint_pan_angle = atan2(magicDetectionMsg.base_footprint_point.point.y, magicDetectionMsg.base_footprint_point.point.x);
       magicDetectionMsg.base_footprint_tilt_angle = atan2(magicDetectionMsg.base_footprint_point.point.z, magicDetectionMsg.base_footprint_point.point.x);
       // angle from head
-      magicDetectionMsg.head_pan_angle = atan2(magicDetectionMsg.head_point.point.y, magicDetectionMsg.head_point.point.x);
-      magicDetectionMsg.head_tilt_angle = atan2(magicDetectionMsg.head_point.point.y, magicDetectionMsg.head_point.point.x);
+      magicDetectionMsg.head_pan_angle = atan2(magicDetectionMsg.Head_point.point.y, magicDetectionMsg.Head_point.point.x);
+      magicDetectionMsg.head_tilt_angle = atan2(magicDetectionMsg.Head_point.point.y, magicDetectionMsg.Head_point.point.x);
 
       magicDetectionsMsg.detections.push_back(magicDetectionMsg);
 
