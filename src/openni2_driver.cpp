@@ -731,7 +731,18 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
         }
         catch ( const tf::TransformException& e)
         {
-          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to base_footprint");
+          ROS_ERROR_STREAM("Error in lookUpTransform from base_footprint to odom");
+        }
+
+      try
+        {
+          tf_listener_.transformPoint("map",
+                                      magicDetectionMsg.odom_point,
+                                      magicDetectionMsg.map_point);
+        }
+        catch ( const tf::TransformException& e)
+        {
+          ROS_ERROR_STREAM_THROTTLE(10, "Error in lookUpTransform from odom to map");
         }
 
       magicDetectionMsg.id = user.getId();
