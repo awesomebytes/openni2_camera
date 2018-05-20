@@ -723,7 +723,7 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
       // Transforms are ordered by actual proximity in the tree
       try
         {
-          tf_listener_.transformPoint("head",
+          tf_listener_.transformPoint("Head",
                                       magicDetectionMsg.CameraDepth_optical_frame_point,
                                       magicDetectionMsg.head_point);
         }
