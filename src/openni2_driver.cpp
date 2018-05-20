@@ -855,47 +855,6 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
 
       if (user.getSkeleton().getState() == nite::SKELETON_TRACKED)
         drawSkeleton(userTracker, user, userImage);
-
-      // deal with every depth map for every user separated publication
-      sensor_msgs::Image img_msg;
-
-      openni::VideoFrameRef frame = userTrackerFrame.getDepthFrame();
-      sensor_msgs::Image curr_depth_frame = from_depth_frame_to_ros_image(frame);
-      cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-      if (pub_user1_img_.getNumSubscribers() > 0){
-        curr_depth_frame->image.copyTo(userImage, userMask);
-        cv_image_user1_.encoding = curr_depth_frame->encoding;
-        cv_image_user1_.image = userImage;
-        img_msg.header.stamp = ros::Time::now();
-        cv_image_user1_.toImageMsg(img_msg);
-        pub_user1_img_.publish(img_msg);
-      }
-
-      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-      curr_depth_frame->image.copyTo(userImage, userMask);
-      cv_image_user2_.encoding = curr_depth_frame->encoding;
-      cv_image_user2_.image = userImage;
-      img_msg.header.stamp = ros::Time::now();
-      cv_image_user2_.toImageMsg(img_msg);
-      pub_user2_img_.publish(img_msg);
-
-      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-      curr_depth_frame->image.copyTo(userImage, userMask);
-      cv_image_user3_.encoding = curr_depth_frame->encoding;
-      cv_image_user3_.image = userImage;
-      img_msg.header.stamp = ros::Time::now();
-      cv_image_user3_.toImageMsg(img_msg);
-      pub_user3_img_.publish(img_msg);
-
-      userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), cv_bridge::getCvType(curr_depth_frame->encoding));
-      curr_depth_frame->image.copyTo(userImage, userMask);
-      cv_image_user4_.encoding = curr_depth_frame->encoding;
-      cv_image_user4_.image = userImage;
-      img_msg.header.stamp = ros::Time::now();
-      cv_image_user4_.toImageMsg(img_msg);
-      pub_user4_img_.publish(img_msg);
-
-
     }
   }
 
