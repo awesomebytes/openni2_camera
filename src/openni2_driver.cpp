@@ -920,7 +920,7 @@ void OpenNI2Driver::newUserTrackerFrameCallback(nite::UserTrackerFrameRef userTr
     const nite::UserData& user = users[i];
 
     //try to start tracking the skeleton of new users
-    if (user.isNew())
+    if (user.isNew() && publish_skeletons_tf_)
     {
       userTracker.startSkeletonTracking(user.getId());
     }
