@@ -141,6 +141,8 @@ private:
   void publishUsers(nite::UserTrackerFrameRef userTrackerFrame);
   void publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
                       nite::UserTracker& userTracker);
+  void publishUsersDepth(nite::UserTrackerFrameRef userTrackerFrame,
+                                   nite::UserTracker& userTracker);
   bool getCameraPose(geometry_msgs::TransformStamped& cameraPose);
 
   void publishTransforms(nite::UserTrackerFrameRef userTracker, const std::string& frame_id);
