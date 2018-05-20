@@ -697,6 +697,8 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
       detectionMsg.position3D.header.frame_id = depth_frame_id_;
       detectionMsg.position3D.point.x = user.getCenterOfMass().x/1000.0; //from mm to m
       detectionMsg.position3D.point.y = user.getCenterOfMass().y/1000.0;
+      // Apparently y is inverted
+      detectionMsg.position3D.point.y *= -1.0;
       detectionMsg.position3D.point.z = user.getCenterOfMass().z/1000.0;
 
       std::cout << "User position from depth image:        " << worldX/1000 << ", " << worldY/1000 << ", " << worldZ/1000 << " m " << std::endl;
