@@ -588,6 +588,17 @@ void OpenNI2Driver::newDepthFrameCallback(sensor_msgs::ImagePtr image)
         cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
       }
 
+      // Store the last depth image we had
+      try
+      {
+        last_depth_frame_ = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::TYPE_16UC1);
+      }
+      catch (cv_bridge::Exception& e)
+      {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+      }
+
       if (depth_raw_subscribers_)
       {
         pub_depth_raw_.publish(image, cam_info);
@@ -848,15 +859,17 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       // deal with every depth map for every user separated publication
       sensor_msgs::Image img_msg;
       cv::Mat userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      cvUserMap.copyTo(userImage, userMask);
-      cv_image_user1_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
-      cv_image_user1_.image = userImage;
-      img_msg.header.stamp = ros::Time::now();
-      cv_image_user1_.toImageMsg(img_msg);
-      pub_user1_img_.publish(img_msg);
+      if (pub_user1_img_.getNumSubscribers() > 0){
+        last_depth_frame_->copyTo(userImage, userMask);
+        cv_image_user1_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
+        cv_image_user1_.image = userImage;
+        img_msg.header.stamp = ros::Time::now();
+        cv_image_user1_.toImageMsg(img_msg);
+        pub_user1_img_.publish(img_msg);
+      }
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      cvUserMap.copyTo(userImage, userMask);
+      last_depth_frame_->copyTo(userImage, userMask);
       cv_image_user2_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user2_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
@@ -864,7 +877,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       pub_user2_img_.publish(img_msg);
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      cvUserMap.copyTo(userImage, userMask);
+      last_depth_frame_->copyTo(userImage, userMask);
       cv_image_user3_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user3_.image = userImage;
       img_msg.header.stamp = ros::Time::now();
@@ -872,7 +885,7 @@ void OpenNI2Driver::publishUserMap(nite::UserTrackerFrameRef userTrackerFrame,
       pub_user3_img_.publish(img_msg);
 
       userImage = cv::Mat::zeros(userMap.getHeight(), userMap.getWidth(), CV_16UC1);
-      cvUserMap.copyTo(userImage, userMask);
+      last_depth_frame_->copyTo(userImage, userMask);
       cv_image_user4_.encoding = sensor_msgs::image_encodings::TYPE_16UC1;
       cv_image_user4_.image = userImage;
       img_msg.header.stamp = ros::Time::now();

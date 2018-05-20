@@ -236,6 +236,8 @@ private:
   tf::TransformBroadcaster tf_br_;
   bool publish_camera_pose_;
 
+
+  cv_bridge::CvImagePtr last_depth_frame_;
   image_transport::ImageTransport user1_image_transport_;
   image_transport::Publisher pub_user1_img_;
   cv_bridge::CvImage cv_image_user1_;
