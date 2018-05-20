@@ -50,6 +50,9 @@
 #include <boost/thread/thread.hpp>
 #include <boost/filesystem.hpp>
 
+// Just math
+#include <math.h>
+
 namespace openni2_wrapper
 { 
 
@@ -710,6 +713,24 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
       detectionMsg.position3D.point.z = user.getCenterOfMass().z/1000.0;
 
       magicDetectionMsg.CameraDepth_optical_frame_point = detectionMsg.position3D;
+      magicDetectionMsg.detection_depth_pixel_x = depthX;
+      magicDetectionMsg.detection_depth_pixel_x = depthY;
+      magicDetectionMsg.detection_bbox_min_x = user.getBoundingBox().min.x;
+      magicDetectionMsg.detection_bbox_max_x = user.getBoundingBox().max.x;
+      magicDetectionMsg.detection_bbox_min_y = user.getBoundingBox().min.y;
+      magicDetectionMsg.detection_bbox_max_y = user.getBoundingBox().max.y;
+
+      // Transforms are ordered by actual proximity in the tree
+      try
+        {
+          tf_listener_.transformPoint("head",
+                                      magicDetectionMsg.CameraDepth_optical_frame_point,
+                                      magicDetectionMsg.head_point);
+        }
+        catch ( const tf::TransformException& e)
+        {
+          ROS_ERROR_STREAM("Error in lookUpTransform from CameraDepth_optical_frame to head");
+        }
 
 
       try
@@ -746,6 +767,14 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
         }
 
       magicDetectionMsg.id = user.getId();
+
+      // angle from base_footprint
+      magicDetectionMsg.base_footprint_pan_angle = atan2(magicDetectionMsg.base_footprint_point.point.y, magicDetectionMsg.base_footprint_point.point.x);
+      magicDetectionMsg.base_footprint_tilt_angle = atan2(magicDetectionMsg.base_footprint_point.point.z, magicDetectionMsg.base_footprint_point.point.x);
+      // angle from head
+      magicDetectionMsg.head_pan_angle = atan2(magicDetectionMsg.head_point.point.y, magicDetectionMsg.head_point.point.x);
+      magicDetectionMsg.head_tilt_angle = atan2(magicDetectionMsg.head_point.point.y, magicDetectionMsg.head_point.point.x);
+
       magicDetectionsMsg.detections.push_back(magicDetectionMsg);
 
       std::cout << "User position from depth image:        " << worldX/1000 << ", " << worldY/1000 << ", " << worldZ/1000 << " m " << std::endl;
