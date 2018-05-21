@@ -442,7 +442,7 @@ void OpenNI2Driver::depthConnectCb()
   depth_subscribers_ = pub_depth_.getNumSubscribers() > 0;
   depth_raw_subscribers_ = pub_depth_raw_.getNumSubscribers() > 0;
 
-  bool need_depth = depth_subscribers_ || depth_raw_subscribers_;
+  bool need_depth = depth_subscribers_ || depth_raw_subscribers_ || pub_user_map_.getNumSubscribers() > 0;
 
   if (need_depth && !device_->isDepthStreamStarted())
   {
