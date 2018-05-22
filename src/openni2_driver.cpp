@@ -714,7 +714,7 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
 
       magicDetectionMsg.CameraDepth_optical_frame_point = detectionMsg.position3D;
       magicDetectionMsg.detection_depth_pixel_x = depthX;
-      magicDetectionMsg.detection_depth_pixel_x = depthY;
+      magicDetectionMsg.detection_depth_pixel_y = depthY;
       magicDetectionMsg.detection_bbox_min_x = user.getBoundingBox().min.x;
       magicDetectionMsg.detection_bbox_max_x = user.getBoundingBox().max.x;
       magicDetectionMsg.detection_bbox_min_y = user.getBoundingBox().min.y;
