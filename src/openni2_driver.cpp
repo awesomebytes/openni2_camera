@@ -690,6 +690,9 @@ void OpenNI2Driver::publishUsers(nite::UserTrackerFrameRef userTrackerFrame)
                    " max = (" << user.getBoundingBox().max.x << ", " << user.getBoundingBox().max.y << ", " << user.getBoundingBox().max.z << ")" << std::endl;
       int depthX = user.getBoundingBox().min.x + (user.getBoundingBox().max.x - user.getBoundingBox().min.x)/2;
       int depthY = user.getBoundingBox().min.y + (user.getBoundingBox().max.y - user.getBoundingBox().min.y)/2;
+      if (depthX == 0 && depthY == 0){
+        continue;
+      }
       float worldX;
       float worldY;
       float worldZ;
